@@ -43,7 +43,7 @@ void insertarDiccionario (tpDiccionario *cabeza, tpuntero *l, char tecla){
  
 int main(){
 
-    //------------------ Inicia creacion de la estructura del teclado ------------------
+    //------------------ Inicia Creacion de la estructura del teclado ------------------
     tpDiccionario dic;
     dic = NULL;
     
@@ -171,48 +171,69 @@ int main(){
     imprimirLista(cero);
     insertarDiccionario(&dic, &cero, '0');
     printf("\n");
-    //------------------ termina Creacion ------------------
+    //------------------ termina Creacion estructura ------------------
     
     
+    // Obtener el input del usuario
     char strInput[30];
 	printf("Ingrese el texto a traducir: ");
 	scanf("%[^\n]%*c", strInput);
 	printf("\n");
+    //------------------------------
 	
+
+    //------------------ Inicia logica de conversion ------------------
     int pos = 0;
     int banderaInsercion = 0;
-	char completeResult[200];
-	char teclaRes[200];
-	tpDiccionario actualDicc = dic;
+    tpDiccionario actualDicc = dic;
 	tpuntero sublistaAct = NULL;
-	strcpy(completeResult, "");
-	strcpy(teclaRes, "");
+	char completeResult[200];
+	char teclaRes[10];
+    strcpy(completeResult, ""); //Limpia el string
+	strcpy(teclaRes, ""); //Limpia el string
 	
-	while(strInput[pos]){
+	
+	
+	while(strInput[pos]){ //Recorre cada caracter del texto que ingreso el usuario
 	    printf("Comienza nueva letra: %c\n", strInput[pos]);
-	    while(actualDicc){
-	        printf("Revisando la tecla: %c\n", actualDicc->tecla);
-            sublistaAct = actualDicc->subl;
-            while(sublistaAct){
-                strcat(teclaRes, (char[2]) {actualDicc->tecla, '\0'});
-                if(sublistaAct->letra == strInput[pos]){
-                    printf("Letra '%c' encontrada, insertando resultado parcial: %s\n", sublistaAct->letra, teclaRes);
-                    strcat(completeResult, teclaRes);
-                    banderaInsercion = 1;
+        if(strInput[pos] == '*'){
+            printf("Simbolo '%c' encontrado, insertando la tecla: %c\n", strInput[pos], strInput[pos]);
+            strcat(completeResult, "*");
+            banderaInsercion = 1;
+        } else if(strInput[pos] == '#'){
+            printf("Simbolo '%c' encontrado, insertando la tecla: %c\n", strInput[pos], strInput[pos]);
+            strcat(completeResult, "#");
+            banderaInsercion = 1;
+        } else {
+            while(actualDicc){ //Itera por todo el diccionario del teclado
+                printf("Revisando la tecla: %c\n", actualDicc->tecla);
+                sublistaAct = actualDicc->subl; //Obtiene la lista de caracteres asociado a la tecla actual
+                while(sublistaAct){
+                    //Conforme se mueve en la lista, agrega 1 tecla al buffer temporal "teclaRes"
+                    strcat(teclaRes, (char[2]) {actualDicc->tecla, '\0'});
+                    if(sublistaAct->letra == strInput[pos]){ 
+                        //Si encuentra la letra que es, agrega el temporal al resultado final
+                        printf("Letra '%c' encontrada, insertando resultado parcial: %s\n", sublistaAct->letra, teclaRes);
+                        strcat(completeResult, teclaRes);
+                        banderaInsercion = 1;
+                        break;
+                    }
+                    sublistaAct = sublistaAct->sig;
+                }
+                strcpy(teclaRes, ""); //Limpia el string
+                if(banderaInsercion){
                     break;
                 }
-                sublistaAct = sublistaAct->sig;
+                actualDicc = actualDicc->sig;
             }
-            strcpy(teclaRes, "");
-            if(banderaInsercion){
-                break;
-            }
-            actualDicc = actualDicc->sig;
         }
+
 		if(!banderaInsercion){
-		    fprintf(stderr, "Caracter '%s' desconocido...\n", strInput[pos]);
+            /*Si termina de recorrer el diccionario y no se hizo una insercion, 
+            se muestra un error y continua con el siguiente caracter*/
+            fprintf(stderr, "Caracter '%c' desconocido...\n", strInput[pos]);
 		} else {
-		    banderaInsercion = 0;
+		    banderaInsercion = 0; //Limpia la bandera
 		}
 		actualDicc = dic;
 		pos = pos + 1;
